@@ -7,6 +7,7 @@ import {
     addMomentPost,
     addMomentComment,
     addPendingReaction,
+    findRecentDuplicateMomentPost,
     getVisibleComments,
     getVisiblePosts,
     loadMomentsConfig,
@@ -312,6 +313,17 @@ async function dispatchMomentsPost(action: ActionTag, context: ActionContext): P
         return;
     }
 
+    // 内容去重：生图前先判重，命中直接丢弃（同一 [朋友圈] 块被多路径重复派发时兜底）
+    if (findRecentDuplicateMomentPost({
+        authorType: "character",
+        authorId: context.characterId,
+        content: parsed.content,
+        photoDescription: parsed.photoDescription,
+    })) {
+        console.warn(`[ActionParser] SKIP duplicate moments post from ${context.sourceEngine} engine`);
+        return;
+    }
+
     const contacts = loadChatContacts();
     const visibility = contacts.map(c => c.characterId);
     const photoUrl = parsed.photoDescription
@@ -330,6 +342,10 @@ async function dispatchMomentsPost(action: ActionTag, context: ActionContext): P
         photoUrl,
         visibility,
     });
+    if (!post) {
+        console.warn(`[ActionParser] SKIP duplicate moments post from ${context.sourceEngine} engine`);
+        return;
+    }
 
     console.log(`[ActionParser] Created moments post from ${context.sourceEngine} engine`);
     dispatchMomentsUpdated();

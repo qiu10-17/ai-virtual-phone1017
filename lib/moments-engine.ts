@@ -10,6 +10,7 @@ import type { Character } from "./character-types";
 import {
     addMomentPost,
     addMomentComment,
+    findRecentDuplicateMomentPost,
     toggleMomentLike,
     loadMomentPosts,
     saveMomentPosts,
@@ -330,6 +331,17 @@ async function triggerAIPost(characterId: string): Promise<void> {
         const parsed = parseMomentPostResponse(postText);
         if (!parsed) return;
 
+        // 内容去重：生图前先判重，命中直接丢弃（防止同一内容经多路径重复入库）
+        if (findRecentDuplicateMomentPost({
+            authorType: "character",
+            authorId: characterId,
+            content: parsed.content,
+            photoDescription: parsed.photoDescription,
+        })) {
+            console.warn(`[Moments] SKIP duplicate AI post from ${character.name}`);
+            return;
+        }
+
         const contacts = loadChatContacts();
         const visibility = contacts.map(c => c.characterId);
         const photoUrl = parsed.photoDescription
@@ -347,6 +359,10 @@ async function triggerAIPost(characterId: string): Promise<void> {
             photoUrl,
             visibility,
         });
+        if (!post) {
+            console.warn(`[Moments] SKIP duplicate AI post from ${character.name}`);
+            return;
+        }
 
         // Increment event counter for auto-summarization (native data read at summarization time)
         incrementEventCounter(characterId);
