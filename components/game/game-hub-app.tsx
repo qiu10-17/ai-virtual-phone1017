@@ -2675,19 +2675,23 @@ export function GameHubApp({ onClose }: { onClose: () => void }) {
                     </button>
                   </div>
                 </div>
-                <details className="game-advanced-details" open={advancedStudioOpen} onToggle={event => setAdvancedStudioOpen(event.currentTarget.open)}>
-                  <summary>高级设置：角色槽位与独立选择页</summary>
-                  <div className="game-studio-panel">
-                    <h3>角色槽位 JSON</h3>
-                    <p className="game-studio-hint">普通单文件游戏可以保持 []。只有需要宿主校验固定身份、最少/最多人数，或把选择页和游戏页拆开时才需要填写。</p>
-                    <textarea value={draft.roleSlotsText} rows={10} spellCheck={false} onChange={event => updateDraft("roleSlotsText", event.target.value)} />
-                  </div>
-                  <div className="game-studio-panel">
-                    <h3>独立角色选择 HTML</h3>
-                    <p className="game-studio-hint">只有上方角色槽位不为空时才会使用。普通模式不需要填写。</p>
-                    <textarea value={draft.pickerHtml} rows={12} spellCheck={false} onChange={event => updateDraft("pickerHtml", event.target.value)} />
-                  </div>
-                </details>
+                {/* 角色槽位属于旧的模板级选人通路（现行做法是游戏 HTML 内自行选人），
+                    入口不再对新草稿开放；仅在编辑已带槽位的存量作品时显示以保持兼容。 */}
+                {parseGameRoleSlots(draft.roleSlotsText).length > 0 ? (
+                  <details className="game-advanced-details" open={advancedStudioOpen} onToggle={event => setAdvancedStudioOpen(event.currentTarget.open)}>
+                    <summary>高级设置：角色槽位与独立选择页（旧版兼容）</summary>
+                    <div className="game-studio-panel">
+                      <h3>角色槽位 JSON</h3>
+                      <p className="game-studio-hint">该作品使用了旧版角色槽位机制，此处保留编辑能力。清空为 [] 后将改为游戏内自行选人。</p>
+                      <textarea value={draft.roleSlotsText} rows={10} spellCheck={false} onChange={event => updateDraft("roleSlotsText", event.target.value)} />
+                    </div>
+                    <div className="game-studio-panel">
+                      <h3>独立角色选择 HTML</h3>
+                      <p className="game-studio-hint">只有上方角色槽位不为空时才会使用。</p>
+                      <textarea value={draft.pickerHtml} rows={12} spellCheck={false} onChange={event => updateDraft("pickerHtml", event.target.value)} />
+                    </div>
+                  </details>
+                ) : null}
               </>
             ) : null}
           </section>
