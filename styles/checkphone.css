@@ -19955,3 +19955,19 @@
 .cp-history-close:active {
   background: rgba(255, 255, 255, 0.08);
 }
+
+/* ── 滚动容器子项防压缩守护 ──
+   列式 flex 滚动容器的子项默认可被压缩（flex-shrink:1）：内容略超容器时
+   子项被压进容器（scrollHeight==clientHeight），页面卡住滚不动；超过子项
+   最小压缩极限后才恢复滚动。统一钉死：滚动列表子项保持自然高度，超出即滚。
+   组件内联样式的滚动容器请加 cp-scroll-guard 类。 */
+.cp-roster-view > *,
+.cp-browser-scroll > *,
+.cp-phone-scroll > *,
+.cp-shopping-scroll > *,
+.cp-photos-body > *,
+.cp-xhs-scroll > *,
+.cp-xhs-video-comments-sheet .cp-xhs-comment-list > *,
+.cp-scroll-guard > * {
+  flex-shrink: 0;
+}
