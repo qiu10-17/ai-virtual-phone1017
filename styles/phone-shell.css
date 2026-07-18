@@ -982,13 +982,28 @@
   padding: 20px 0 36px;
 }
 
-/* 更窄视口（≤373px）：66px 格 + 20px 距显得拥挤、dock 图标紧贴胶囊边缘，
-   进一步同步缩小格子与间距（网格/dock 同公式，保持对齐）。≥374px 不受影响。 */
+/* 更窄视口（≤373px）：按 390px 设计稿整体等比缩放（格 66→16.92vw、
+   距 20→5.13vw、图标 58→14.87vw、dock 354→90.77vw），窄屏呈现与正常
+   手机完全相同的比例观感，无多余留白；网格/dock 同源，天然对齐。
+   ≥374px 不受影响。 */
 @media (max-width: 373px) and (hover: none) and (pointer: coarse) {
   .icon-grid,
   .dock {
-    --slot-gap-x: 14px;
-    --slot-size: clamp(52px, calc((100vw - 126px) / 4), 62px);
+    --slot-size: 16.92vw;
+    --slot-gap-x: 5.13vw;
+    --slot-icon-width: 15.9vw;
+    --slot-icon-height: 15.9vw;
+  }
+  .icon-glyph-box {
+    width: 14.87vw;
+    height: 14.87vw;
+  }
+  .dock {
+    width: min(90.77vw, calc(100% - 8px));
+  }
+  .dock .dock-glyph-box {
+    width: 14.87vw;
+    height: 14.87vw;
   }
 }
 
